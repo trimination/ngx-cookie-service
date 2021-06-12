@@ -9,6 +9,7 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
   providedIn: 'root',
 })
 export class CookieService {
+  private readonly COOKIE_EXPIRY_DAYS_MAX: number = 31;
   private readonly documentIsAccessible: boolean;
 
   constructor(
@@ -155,13 +156,25 @@ export class CookieService {
     }
 
     if (typeof expiresOrOptions === 'number' || expiresOrOptions instanceof Date || path || domain || secure || sameSite) {
-      const optionsBody = {
-        expires: expiresOrOptions,
-        path,
-        domain,
-        secure,
-        sameSite: sameSite ? sameSite : 'Lax',
-      };
+      let optionsBody;
+      if (typeof expiresOrOptions === 'number' && expiresOrOptions > this.COOKIE_EXPIRY_DAYS_MAX) {
+        optionsBody = {
+          expiresSeconds: expiresOrOptions,
+          path,
+          domain,
+          secure,
+          sameSite: sameSite ? sameSite : 'Lax',
+        };
+      } else {
+        optionsBody = {
+          expires: expiresOrOptions,
+          path,
+          domain,
+          secure,
+          sameSite: sameSite ? sameSite : 'Lax',
+        };
+      }
+
 
       this.set(name, value, optionsBody);
       return;
@@ -181,6 +194,13 @@ export class CookieService {
       }
     }
 
+    if (options.expiresSeconds) {
+      if (typeof options.expiresSeconds === 'number') {
+        const dateExpires: Date = new Date(new Date().getTime() + options.expiresSeconds * 1000);
+        cookieString += 'expires=' + dateExpires.toUTCString() + ';';
+      }
+    }
+
     if (options.path) {
       cookieString += 'path=' + options.path + ';';
     }
@@ -193,7 +213,7 @@ export class CookieService {
       options.secure = true;
       console.warn(
         `[ngx-cookie-service] Cookie ${name} was forced with secure flag because sameSite=None.` +
-          `More details : https://github.com/stevermeister/ngx-cookie-service/issues/86#issuecomment-597720130`
+        `More details : https://github.com/stevermeister/ngx-cookie-service/issues/86#issuecomment-597720130`
       );
     }
     if (options.secure) {

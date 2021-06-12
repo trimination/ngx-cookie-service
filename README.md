@@ -6,6 +6,13 @@ For versions <9, please use 2.3.0 version of library.
 
 The experienced team behind [Studytube](https://www.studytube.nl/) will take care of our cookie service from now on.
 
+---
+Now supports seconds on expirty time
+
+See [this repo](https://github.com/trimination/ngx-cookie-service-build) for a pre-built package to include in package.json
+
+---
+
 # Installation
 
 ```bash
