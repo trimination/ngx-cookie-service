@@ -153,6 +153,15 @@ describe('NgxCookieServiceService', () => {
         expect(documentCookieSetterSpy).toHaveBeenCalledWith('Hello%3DWorld%3B=Hello%3DWorld%3B;sameSite=Lax;');
         expect(documentCookieSetterSpy).toHaveBeenCalledWith('%5Bfoo-_*.%5Dbar=%5Bfoo-_*.%5Dbar;sameSite=Lax;');
       });
+      it('should set cookie with expires options in seconds', () => {
+        jasmine.clock().uninstall();
+        jasmine.clock().install();
+        jasmine.clock().mockDate(new Date('Sun, 15 Mar 2020 10:00:00 GMT'));
+        cookieService.set('foo', 'bar', 60);
+
+        expect(documentCookieSetterSpy).toHaveBeenCalledWith('foo=bar;expires=Sun, 15 Mar 2020 10:01:00 GMT;sameSite=Lax;');
+        jasmine.clock().uninstall();
+      });
       it('should set cookie with expires options in days', () => {
         jasmine.clock().uninstall();
         jasmine.clock().install();
